@@ -6,6 +6,7 @@ import banana_dev as banana
 from PIL import Image
 import base64
 from io import BytesIO
+import replicate
 
 
 def main():
@@ -22,12 +23,13 @@ def initialize_session_state():
         st.session_state.stroke_color = "#000000"
     if "background_color" not in st.session_state:
         st.session_state.background_color = "#ffffff"
+    if "generated_images" not in st.session_state:
+        st.session_state.generated_images = []
 
 
 def drawing_component():
-    # Create a canvas component
+    """The main drawing component."""
     canvas_result = st_canvas(
-        # Fixed fill color with some opacity
         fill_color="rgba(255, 165, 0, 0.3)",
         stroke_width=st.session_state.stroke_width,
         stroke_color=st.session_state.stroke_color,
@@ -59,50 +61,87 @@ def drawing_component():
         st.dataframe(objects)
     run = st.button("Run")
     if run:
-        run_model(canvas_result.image_data)
+        out = run_model(canvas_result.image_data,
+                        model_provider=MODEL_PROVIDER)
+        process_model_outputs(out)
 
 
-def run_model(image_data):
-    model_inputs = get_model_inputs(image_data)
-    out = banana.run(keys["banana-api"], keys["banana-model"], model_inputs)
-    canny_image = base64.b64decode(out["modelOutputs"][0]["canny_base64"])
-    st.image(Image.open(BytesIO(canny_image)))
-    image = base64.b64decode(out["modelOutputs"][0]["image_base64"])
-    st.image(Image.open(BytesIO(image)))
+def run_model(image_data, model_provider="replicate"):
+    """Runs the model on the painted image."""
+    model_inputs = get_model_inputs(image_data, model_provider=model_provider)
+    if model_provider == "banana":
+        out = banana.run(KEYS["banana-api"],
+                         KEYS["banana-model"], model_inputs)
+    elif model_provider == "replicate":
+        out = replicate.run(
+            KEYS["replicate-model"],
+            input=model_inputs,
+        )
+    return out
 
 
-def get_model_inputs(image_data):
-    model_inputs = {
-        "prompt": "rihanna best quality, extremely detailed",
-        "negative_prompt": "monochrome, lowres, bad anatomy, worst quality, low quality",
-        "num_inference_steps": 20,
-        "image_data":  png_export(image_data),
-    }
+def process_model_outputs(out, model_provider="replicate"):
+    """Adds generated images to session state. Displays images."""
+    if model_provider == "banana":
+        image = base64.b64decode(out["modelOutputs"][0]["image_base64"])
+        st.session_state.generated_images.append(image)
+    elif model_provider == "replicate":
+        for image in out:
+            st.session_state.generated_images.append(image)
+    for image in st.session_state.generated_images:
+        try:
+            st.image(image, width=500)
+        except:
+            print(image)
+            st.image(Image.open(BytesIO(image)))
+
+
+def get_model_inputs(image_data, model_provider="replicate"):
+    """Gets a json serializable object of model inputs. Key components are prompt and image."""
+    assert model_provider in ["banana", "replicate"]
+    if model_provider == "banana":
+        image_file = prepare_input_image(image_data)
+        model_inputs = {
+            "prompt": "rihanna best quality, extremely detailed",
+            "negative_prompt": "monochrome, lowres, bad anatomy, worst quality, low quality",
+            "num_inference_steps": 20,
+            "image_data":  image_file,
+        }
+    elif model_provider == "replicate":
+        image_file = prepare_input_image(image_data)
+        model_inputs = {
+            "prompt": "rihanna best quality, extremely detailed",
+            "structure": "scribble",
+            "image":  image_file,
+        }
     return model_inputs
 
 
-def png_export(img_data):
-    im = Image.fromarray(img_data.astype("uint8"), mode="RGBA")
-    # im.save(file_path, "PNG")
-
-    buffered = BytesIO()
-    im.save(buffered, format="PNG")
-    img_data = buffered.getvalue()
-    try:
-        # some strings <-> bytes conversions necessary here
-        b64 = base64.b64encode(img_data.encode()).decode()
-    except AttributeError:
-        b64 = base64.b64encode(img_data).decode()
-    return b64
+def prepare_input_image(image_data):
+    """Prepares the image data for the model."""
+    image_file = BytesIO()
+    Image.fromarray(image_data.astype("uint8"), mode="RGBA").save(
+        image_file, format="PNG")
+    image_file.seek(0)
+    return image_file
 
 
 def read_api_keys():
-    global keys
+    """Reads the api keys from the api_keys.yaml file."""
+    global KEYS
     with open("api_keys.yaml", "r") as f:
-        keys = yaml.load(f, Loader=yaml.FullLoader)
+        KEYS = yaml.load(f, Loader=yaml.FullLoader)
+
+
+def define_provider():
+    """Defines the model provider. Current version is validated on replicate."""
+    global MODEL_PROVIDER
+    default_provider = "replicate"
+    MODEL_PROVIDER = default_provider
 
 
 if __name__ == "__main__":
     read_api_keys()
+    define_provider()
     initialize_session_state()
     main()
