@@ -25,6 +25,8 @@ def initialize_session_state():
         st.session_state.generated_images = []
     if "current_page" not in st.session_state:
         st.session_state.current_page = "Landing"
+    if "current_game_id" not in st.session_state:
+        st.session_state.current_game_id = None
 
 
 def read_api_keys():
