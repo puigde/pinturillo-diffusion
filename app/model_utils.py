@@ -34,6 +34,11 @@ def process_model_outputs(out, model_provider="replicate"):
             st.image(image, width=500)
         except:
             st.image(Image.open(BytesIO(image)))
+    if st.session_state.current_game_id is not None:
+        with open(f"game_{st.session_state.current_game_id}/last_image.png", "wb") as f:
+            buffer = BytesIO()
+            st.session_state.generated_images[-1].save(buffer, format='PNG')
+            f.write(buffer.getvalue())
 
 
 def get_model_inputs(image_data, model_provider="replicate"):
