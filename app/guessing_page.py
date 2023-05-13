@@ -15,7 +15,7 @@ hint_interval = 3  # seconds
 
 def pre_guessing_page():
     st.session_state.current_page = "Pre_guessing"
-    show_centered_title("Enter a game id:")
+    show_centered_title("Enter a game:")
     game_id = st.text_input("Game id")
     if not os.path.exists(f"game_{game_id}"):
         prev_enter = st.button("Access game")
@@ -100,20 +100,27 @@ def chat_component():
     st.session_state.chat = read_chat_file("chat.txt")
     m = f"""
     <style>
-    .chat {{
+    #chat {{
         height: 300px;
         overflow-y: scroll;
         border: 1px solid #ccc;
     }}
 
-    .chat p {{
+    #chat p {{
         margin: 0;
     }}
     </style>
 
-    <div class="chat">
+    <div id="chat">
     {"".join([f"<p><span style='color: {usercolor(message.username)};'>{message.username}</span>: {message.text.strip()}</p>" for message in st.session_state.chat])}
     </div>
+
+    <script>
+    // I think this does not work inside st.markdown...
+    let chat = document.getElementById("chat");
+    console.log(chat.scrollHeight);
+    chat.scrollTop = chat.scrollHeight;
+    </script>
     """
     st.markdown(m, unsafe_allow_html=True)
     st.text_input("", on_change=chat_callback, key="add_message", label_visibility="collapsed")
