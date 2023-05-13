@@ -5,6 +5,7 @@ from PIL import Image
 from model_utils import run_model, process_model_outputs
 import random
 import os
+from ui_utils import display_generated_images
 
 
 def drawing_page():
@@ -65,3 +66,5 @@ def drawing_component():
                 out = run_model(canvas_result.image_data,
                                 model_provider=st.session_state.model_provider)
             process_model_outputs(out)
+        else:
+            display_generated_images()

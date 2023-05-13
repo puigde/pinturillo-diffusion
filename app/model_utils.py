@@ -6,6 +6,7 @@ from io import BytesIO
 import streamlit as st
 from image_utils import prepare_input_image
 import requests
+from ui_utils import display_generated_images
 
 
 def run_model(image_data, model_provider="replicate"):
@@ -30,11 +31,7 @@ def process_model_outputs(out, model_provider="replicate"):
     elif model_provider == "replicate" or model_provider is None:
         for image in out:
             st.session_state.generated_images.append(image)
-    for image in st.session_state.generated_images:
-        try:
-            st.image(image, width=500)
-        except:
-            st.image(Image.open(BytesIO(image)))
+    display_generated_images()
     if st.session_state.current_game_id is not None:
         with open(f"game_{st.session_state.current_game_id}/last_image.png", "wb") as f:
             last_image = st.session_state.generated_images[-1]
