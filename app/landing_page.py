@@ -9,8 +9,8 @@ def landing_page():
     show_centered_title("Pinturillo Diffusion")
     st.markdown(f"<h1 style='text-align: center; color: grey;'>{img_to_html('logo.png')}</h1>",
                 unsafe_allow_html=True)
-    c0, c1 = st.columns(2)
-    with c0:
+    cs = st.columns([2.5, 1, 1, 1.5])
+    with cs[1]:
         st.button("Drawing", on_click=drawing_page_callback)
-    with c1:
+    with cs[2]:
         st.button("Guessing", on_click=pre_guessing_page_callback)
