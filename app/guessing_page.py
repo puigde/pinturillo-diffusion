@@ -10,7 +10,7 @@ import time
 
 
 seed = time.time_ns() % 100  # TODO
-hint_interval = 3  # seconds
+hint_interval = 20  # seconds
 
 
 def pre_guessing_page():
@@ -32,8 +32,7 @@ def guessing_page():
     st.session_state.current_page = "Guessing"
     show_centered_title(f"Guessing in game {st.session_state.current_game_id}")
     st.session_state.word = "turtle"
-    st.session_state.count = st_autorefresh(
-        interval=1000, limit=hint_interval * 60, key="counter")
+    st.session_state.count = st_autorefresh(interval=1000, key="counter")
     c0, c1 = st.columns(2)
     with c0:
         counter_component()
