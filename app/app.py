@@ -1,3 +1,4 @@
+from pathlib import Path
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import pandas as pd
@@ -10,10 +11,25 @@ import replicate
 
 
 def main():
-    st.set_page_config(page_icon="logo.png", page_title="Pinturillo Diffusion", layout="wide")
-    st.title("Pinturillo Diffusion")
-    st.image("logo.png")
+    st.set_page_config(page_icon="logo.png",
+                       page_title="Pinturillo Diffusion", layout="wide")
+    show_centered_title("Pinturillo Diffusion")
+    st.markdown(f"<h1 style='text-align: center; color: grey;'>{img_to_html('logo.png')}</h1>",
+                unsafe_allow_html=True)
     drawing_component()
+
+
+def img_to_bytes(img_path):
+    img_bytes = Path(img_path).read_bytes()
+    encoded = base64.b64encode(img_bytes).decode()
+    return encoded
+
+
+def img_to_html(img_path):
+    img_html = "<img src='data:image/png;base64,{}' class='img-fluid'>".format(
+        img_to_bytes(img_path)
+    )
+    return img_html
 
 
 def initialize_session_state():
@@ -25,6 +41,11 @@ def initialize_session_state():
         st.session_state.background_color = "#ffffff"
     if "generated_images" not in st.session_state:
         st.session_state.generated_images = []
+
+
+def show_centered_title(title):
+    st.markdown(f"<h1 style='text-align: center; color: black;'>{title}</h1>",
+                unsafe_allow_html=True)
 
 
 def drawing_component():
@@ -61,8 +82,12 @@ def drawing_component():
         st.dataframe(objects)
     run = st.button("Run")
     if run:
-        out = run_model(canvas_result.image_data,
-                        model_provider=MODEL_PROVIDER)
+        if MODEL_PROVIDER is None:
+            out = [Image.open("sample_image.png")]
+
+        else:
+            out = run_model(canvas_result.image_data,
+                            model_provider=MODEL_PROVIDER)
         process_model_outputs(out)
 
 
@@ -85,14 +110,13 @@ def process_model_outputs(out, model_provider="replicate"):
     if model_provider == "banana":
         image = base64.b64decode(out["modelOutputs"][0]["image_base64"])
         st.session_state.generated_images.append(image)
-    elif model_provider == "replicate":
+    elif model_provider == "replicate" or model_provider is None:
         for image in out:
             st.session_state.generated_images.append(image)
     for image in st.session_state.generated_images:
         try:
             st.image(image, width=500)
         except:
-            print(image)
             st.image(Image.open(BytesIO(image)))
 
 
@@ -138,6 +162,7 @@ def define_provider():
     global MODEL_PROVIDER
     default_provider = "replicate"
     MODEL_PROVIDER = default_provider
+    MODEL_PROVIDER = None  # avoid replicate calls in test mode and display saved image
 
 
 if __name__ == "__main__":
