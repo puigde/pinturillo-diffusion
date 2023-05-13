@@ -136,10 +136,11 @@ def chat_component():
 
 
 def chat_callback():
-    st.session_state.chat.append(st.session_state.add_message)
     with open(f"game_{st.session_state.current_game_id}/chat.txt", "a") as f:
         f.write(f"{st.session_state.player_name} {st.session_state.add_message}\n")
     if st.session_state.add_message.upper() == st.session_state.word.upper():
         st.balloons()
         st.session_state.solved = True
+    else:
+        st.session_state.chat.append(st.session_state.add_message)
     st.session_state.add_message = ""
