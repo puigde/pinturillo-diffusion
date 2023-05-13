@@ -15,15 +15,15 @@ hint_interval = 3  # seconds
 
 def pre_guessing_page():
     st.session_state.current_page = "Pre_guessing"
-    show_centered_title("Enter a game:")
-    game_id = st.text_input("Game id")
-    if not os.path.exists(f"game_{game_id}"):
+    show_centered_title("Enter a game id:")
+    current_game_id = st.text_input("Game id")
+    if not os.path.exists(f"game_{current_game_id}"):
         prev_enter = st.button("Access game")
         if prev_enter:
             st.error("Game id does not exist")
     else:
         acess = st.button(
-            "Access game", on_click=access_guessing_callback, args=(game_id,))
+            "Access game", on_click=access_guessing_callback, args=(current_game_id,))
     exit_button()
 
 
@@ -78,26 +78,30 @@ class Message:
     username: str
     text: str
 
+
 def read_chat_file(filename):
     """Reads a chat file.
-    
+
     The chat file is a text file where each line is a message.
     The format of a message is:
     <username> <message>
     """
     if not os.path.exists(filename):
         return []
-    
+
     with open(filename, "r") as f:
         return [Message(*line.split(" ", 1)) for line in f.readlines()]
+
 
 def usercolor(username):
     """Returns the color of a user."""
     return f"#{hash(username) % 0xffffff:06x}"
 
+
 def chat_component():
     """The chat component."""
-    st.session_state.chat = read_chat_file("chat.txt")
+    st.session_state.chat = read_chat_file(
+        f"game_{st.session_state.current_game_id}/chat.txt")
     m = f"""
     <style>
     #chat {{
@@ -123,12 +127,13 @@ def chat_component():
     </script>
     """
     st.markdown(m, unsafe_allow_html=True)
-    st.text_input("", on_change=chat_callback, key="add_message", label_visibility="collapsed")
+    st.text_input("", on_change=chat_callback, key="add_message",
+                  label_visibility="collapsed")
 
 
 def chat_callback():
     st.session_state.chat.append(st.session_state.add_message)
-    with open("chat.txt", "a") as f:
+    with open(f"game_{st.session_state.current_game_id}/chat.txt", "a") as f:
         f.write(f"{st.session_state.username} {st.session_state.add_message}\n")
     if st.session_state.add_message.upper() == st.session_state.word.upper():
         st.balloons()

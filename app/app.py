@@ -20,8 +20,6 @@ def initialize_session_state():
         st.session_state.stroke_width = 3
     if "stroke_color" not in st.session_state:
         st.session_state.stroke_color = "#000000"
-    if "background_color" not in st.session_state:
-        st.session_state.background_color = "#ffffff"
     if "generated_images" not in st.session_state:
         st.session_state.generated_images = []
     if "current_page" not in st.session_state:
