@@ -1,6 +1,11 @@
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import pandas as pd
+import yaml
+import banana_dev as banana
+from PIL import Image
+import base64
+from io import BytesIO
 
 
 def main():
@@ -50,8 +55,52 @@ def drawing_component():
         for col in objects.select_dtypes(include=["object"]).columns:
             objects[col] = objects[col].astype("str")
         st.dataframe(objects)
+    run = st.button("Run")
+    if run:
+        run_model(canvas_result.image_data)
+
+
+def run_model(image_data):
+    model_inputs = get_model_inputs(image_data)
+    out = banana.run(keys["banana-api"], keys["banana-model"], model_inputs)
+    canny_image = base64.b64decode(out["modelOutputs"][0]["canny_base64"])
+    st.image(Image.open(BytesIO(canny_image)))
+    image = base64.b64decode(out["modelOutputs"][0]["image_base64"])
+    st.image(Image.open(BytesIO(image)))
+
+
+def get_model_inputs(image_data):
+    model_inputs = {
+        "prompt": "rihanna best quality, extremely detailed",
+        "negative_prompt": "monochrome, lowres, bad anatomy, worst quality, low quality",
+        "num_inference_steps": 20,
+        "image_data":  png_export(image_data),
+    }
+    return model_inputs
+
+
+def png_export(img_data):
+    im = Image.fromarray(img_data.astype("uint8"), mode="RGBA")
+    # im.save(file_path, "PNG")
+
+    buffered = BytesIO()
+    im.save(buffered, format="PNG")
+    img_data = buffered.getvalue()
+    try:
+        # some strings <-> bytes conversions necessary here
+        b64 = base64.b64encode(img_data.encode()).decode()
+    except AttributeError:
+        b64 = base64.b64encode(img_data).decode()
+    return b64
+
+
+def read_api_keys():
+    global keys
+    with open("api_keys.yaml", "r") as f:
+        keys = yaml.load(f, Loader=yaml.FullLoader)
 
 
 if __name__ == "__main__":
+    read_api_keys()
     initialize_session_state()
     main()
