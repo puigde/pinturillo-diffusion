@@ -32,7 +32,7 @@ def drawing_component():
             fill_color="rgba(255, 165, 0, 0.3)",
             stroke_width=st.session_state.stroke_width,
             stroke_color=st.session_state.stroke_color,
-            background_color=st.session_state.background_color,
+            background_color="#ffffff",
             background_image=None,
             update_streamlit=True,
             height=500,
@@ -43,7 +43,6 @@ def drawing_component():
             key="full_app",
         )
         c01, c02, c03 = st.columns(3)
-        # TODO: make this components refresh after modification using callbacks
         with c01:
             stroke_width = st.slider("Stroke width: ", 1, 25,
                                      key="stroke_width")
@@ -51,9 +50,9 @@ def drawing_component():
             stroke_color = st.color_picker(
                 "Stroke color hex: ", key="stroke_color")
         with c03:
-            background_color = st.color_picker(
-                "Background color hex: ", "#ffffff", key="background_color")
-        run = st.button("Run")
+            run = st.button(
+                "Run model", type="primary")
+
     with c1:
         if run:
             if st.session_state.model_provider is None:

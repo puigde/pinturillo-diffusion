@@ -6,7 +6,7 @@ from image_utils import img_to_html
 def landing_page():
     st.session_state.current_game_id = None
     st.session_state.current_page = "Landing"
-    show_centered_title("Pinturillo Diffusion")
+    show_centered_title("Pinturillo Diffusion", show_logo=False)
     st.markdown(f"<h1 style='text-align: center; color: grey;'>{img_to_html('logo.png')}</h1>",
                 unsafe_allow_html=True)
     c0, c1 = st.columns(2)
