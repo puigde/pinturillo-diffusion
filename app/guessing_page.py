@@ -73,7 +73,7 @@ def hint_component():
     else:
         mask = []
     st.markdown(
-        f"<samp style='font-size: 2em; font-weight: bold;'>{mask_word(st.session_state.word, mask)}</samp>", unsafe_allow_html=True)
+        f"<span style='font-family: monospace; font-size: 2em; font-weight: bold;'>{mask_word(st.session_state.word, mask)}</span>", unsafe_allow_html=True)
 
 
 @dataclass
