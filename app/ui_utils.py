@@ -12,11 +12,15 @@ def exit_button_callback():
 
 
 def drawing_page_callback():
+    if st.session_state.player_name == "" or " " in st.session_state.player_name:
+        return
     st.session_state.current_page = "Drawing"
     st.session_state.generated_images = []
 
 
 def pre_guessing_page_callback():
+    if st.session_state.player_name == "" or " " in st.session_state.player_name:
+        return
     st.session_state.current_page = "Pre_guessing"
     st.session_state.generated_images = []
 

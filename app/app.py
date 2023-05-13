@@ -26,6 +26,8 @@ def initialize_session_state():
         st.session_state.current_page = "Landing"
     if "current_game_id" not in st.session_state:
         st.session_state.current_game_id = None
+    if "player_name" not in st.session_state:
+        st.session_state.player_name = ""
 
 
 def read_api_keys():
