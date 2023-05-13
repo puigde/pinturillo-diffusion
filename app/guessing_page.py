@@ -34,17 +34,16 @@ def guessing_page():
     show_centered_title(f"Guessing in game {st.session_state.current_game_id}")
     st.session_state.word = "turtle"
     st.session_state.count = st_autorefresh(interval=1000, key="counter")
+    c01, c02 = st.columns([1.2, 2])
     c0, c1 = st.columns(2)
+    with c01:
+        counter_component()
+    with c02:
+        hint_component()
     with c0:
-        c01, c02 = st.columns([0.7, 2])
-        with c01:
-            counter_component()
-        c01, c02 = st.columns([0.7, 2])
-        with c02:
-            hint_component()
         try:
             st.image(
-                f"game_{st.session_state.current_game_id}/last_image.png")
+                f"game_{st.session_state.current_game_id}/last_image.png", width=500)
         except:
             pass
     with c1:
@@ -73,7 +72,8 @@ def hint_component():
                 del mask[random.randint(0, len(mask) - 1)]
     else:
         mask = []
-    st.markdown(f"<samp style='font-size: 2em; font-weight: bold;'>{mask_word(st.session_state.word, mask)}</samp>", unsafe_allow_html=True)
+    st.markdown(
+        f"<samp style='font-size: 2em; font-weight: bold;'>{mask_word(st.session_state.word, mask)}</samp>", unsafe_allow_html=True)
 
 
 @dataclass
@@ -109,7 +109,7 @@ def chat_component():
     m = f"""
     <style>
     #chat {{
-        height: 550px;
+        height: 470px;
         overflow-y: scroll;
         border: 1px solid #ccc;
     }}
