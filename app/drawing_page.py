@@ -2,7 +2,6 @@ import streamlit as st
 from ui_utils import show_centered_title, exit_button
 from streamlit_drawable_canvas import st_canvas
 from PIL import Image
-import pandas as pd
 from model_utils import run_model, process_model_outputs
 
 
@@ -34,15 +33,15 @@ def drawing_component():
         c01, c02, c03 = st.columns(3)
         # TODO: make this components refresh after modification using callbacks
         with c01:
-            st.session_state.stroke_width = st.slider("Stroke width: ", 1, 25,
-                                                      st.session_state.stroke_width)
+            stroke_width = st.slider("Stroke width: ", 1, 25,
+                                     key="stroke_width")
         with c02:
-            st.session_state.stroke_color = st.color_picker(
-                "Stroke color hex: ", value=st.session_state.stroke_color)
+            stroke_color = st.color_picker(
+                "Stroke color hex: ", key="stroke_color")
 
         with c03:
-            st.session_state.background_color = st.color_picker(
-                "Background color hex: ", value=st.session_state.background_color)
+            background_color = st.color_picker(
+                "Background color hex: ", "#ffffff", key="background_color")
         run = st.button("Run")
     with c1:
         if run:
