@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import streamlit as st
-from ui_utils import show_centered_title, exit_button, access_guessing_callback, chat_callback
+from ui_utils import show_centered_title, exit_button, access_guessing_callback
 import os
 import random
 import os
@@ -117,6 +117,7 @@ def chat_component():
     """
     st.markdown(m, unsafe_allow_html=True)
     st.text_input("", on_change=chat_callback, key="add_message", label_visibility="collapsed")
+
 
 def chat_callback():
     st.session_state.chat.append(st.session_state.add_message)
