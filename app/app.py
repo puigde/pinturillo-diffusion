@@ -9,7 +9,9 @@ from io import BytesIO
 
 
 def main():
+    st.set_page_config(page_icon="logo.png", page_title="Pinturillo Diffusion", layout="wide")
     st.title("Pinturillo Diffusion")
+    st.image("logo.png")
     drawing_component()
 
 
