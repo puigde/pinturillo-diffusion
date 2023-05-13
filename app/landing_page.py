@@ -9,8 +9,18 @@ def landing_page():
     show_centered_title("Pinturillo Diffusion", show_logo=False)
     st.markdown(f"<h1 style='text-align: center; color: grey;'>{img_to_html('logo.png')}</h1>",
                 unsafe_allow_html=True)
+    _, c_username, _ = st.columns([1.25, 2, 1])
+    with c_username:
+        st.session_state.player_name = st.text_input("Enter your name")
     cs = st.columns([2.5, 1, 1, 1.5])
     with cs[1]:
-        st.button("Drawing", on_click=drawing_page_callback)
+        a = st.button("Drawing", on_click=drawing_page_callback)
     with cs[2]:
-        st.button("Guessing", on_click=pre_guessing_page_callback)
+        b = st.button("Guessing", on_click=pre_guessing_page_callback)
+    if (a or b):
+        _, c_usernamecp, _ = st.columns([1.25, 2, 1])
+        with c_usernamecp:
+            if st.session_state.player_name == "":
+                st.warning("Please enter your username")
+            elif " " in st.session_state.player_name:
+                st.warning("Username cannot contain spaces")

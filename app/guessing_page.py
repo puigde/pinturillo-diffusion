@@ -16,7 +16,6 @@ hint_interval = 20  # seconds
 def pre_guessing_page():
     st.session_state.current_page = "Pre_guessing"
     show_centered_title("Enter a game:")
-    st.session_state.username = st.text_input("Username")
     current_game_id = st.text_input("Game id")
     if not os.path.exists(f"game_{current_game_id}"):
         prev_enter = st.button("Access game")
@@ -74,7 +73,7 @@ def hint_component():
 @dataclass
 class Message:
     """A message."""
-    username: str
+    player_name: str
     text: str
 
 
@@ -83,7 +82,7 @@ def read_chat_file(filename):
 
     The chat file is a text file where each line is a message.
     The format of a message is:
-    <username> <message>
+    <player_name> <message>
     """
     if not os.path.exists(filename):
         return []
@@ -92,9 +91,9 @@ def read_chat_file(filename):
         return [Message(*line.split(" ", 1)) for line in f.readlines()]
 
 
-def usercolor(username):
+def usercolor(player_name):
     """Returns the color of a user."""
-    return f"#{hash(username) % 0xffffff:06x}"
+    return f"#{hash(player_name) % 0xffffff:06x}"
 
 
 def chat_component():
@@ -115,7 +114,7 @@ def chat_component():
     </style>
 
     <div id="chat">
-    {"".join([f"<p><span style='color: {usercolor(message.username)};'>{message.username}</span>: {message.text.strip()}</p>" for message in st.session_state.chat])}
+    {"".join([f"<p><span style='color: {usercolor(message.player_name)};'>{message.player_name}</span>: {message.text.strip()}</p>" for message in st.session_state.chat])}
     </div>
 
     <script>
@@ -133,7 +132,7 @@ def chat_component():
 def chat_callback():
     st.session_state.chat.append(st.session_state.add_message)
     with open(f"game_{st.session_state.current_game_id}/chat.txt", "a") as f:
-        f.write(f"{st.session_state.username} {st.session_state.add_message}\n")
+        f.write(f"{st.session_state.player_name} {st.session_state.add_message}\n")
     if st.session_state.add_message.upper() == st.session_state.word.upper():
         st.balloons()
         st.session_state.solved = True

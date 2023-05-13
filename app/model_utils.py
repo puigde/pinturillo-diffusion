@@ -5,6 +5,7 @@ import base64
 from io import BytesIO
 import streamlit as st
 from image_utils import prepare_input_image
+import requests
 
 
 def run_model(image_data, model_provider="replicate"):
@@ -36,9 +37,20 @@ def process_model_outputs(out, model_provider="replicate"):
             st.image(Image.open(BytesIO(image)))
     if st.session_state.current_game_id is not None:
         with open(f"game_{st.session_state.current_game_id}/last_image.png", "wb") as f:
-            buffer = BytesIO()
-            st.session_state.generated_images[-1].save(buffer, format='PNG')
-            f.write(buffer.getvalue())
+            last_image = st.session_state.generated_images[-1]
+            if isinstance(last_image, str):
+                if last_image.startswith("http"):
+                    response = requests.get(last_image)
+                    response.raise_for_status()
+                    image_bytes = response.content
+                else:
+                    image_bytes = last_image.encode()
+                with Image.open(BytesIO(image_bytes)) as img:
+                    img.save(
+                        f"game_{st.session_state.current_game_id}/last_image.png")
+            else:
+                last_image.save(
+                    f"game_{st.session_state.current_game_id}/last_image.png")
 
 
 def get_model_inputs(image_data, model_provider="replicate"):
