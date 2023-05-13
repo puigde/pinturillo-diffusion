@@ -15,7 +15,8 @@ hint_interval = 3  # seconds
 
 def pre_guessing_page():
     st.session_state.current_page = "Pre_guessing"
-    show_centered_title("Enter a game id:")
+    show_centered_title("Enter a game:")
+    st.session_state.username = st.text_input("Username")
     current_game_id = st.text_input("Game id")
     if not os.path.exists(f"game_{current_game_id}"):
         prev_enter = st.button("Access game")
@@ -30,7 +31,6 @@ def pre_guessing_page():
 def guessing_page():
     st.session_state.current_page = "Guessing"
     show_centered_title(f"Guessing in game {st.session_state.current_game_id}")
-    st.session_state.username = "salcc" + str(seed)
     st.session_state.word = "turtle"
     st.session_state.count = st_autorefresh(
         interval=1000, limit=hint_interval * 60, key="counter")
