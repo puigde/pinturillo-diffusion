@@ -36,8 +36,12 @@ def guessing_page():
     st.session_state.count = st_autorefresh(interval=1000, key="counter")
     c0, c1 = st.columns(2)
     with c0:
-        counter_component()
-        hint_component()
+        c01, c02 = st.columns([0.7, 2])
+        with c01:
+            counter_component()
+        c01, c02 = st.columns([0.7, 2])
+        with c02:
+            hint_component()
         try:
             st.image(
                 f"game_{st.session_state.current_game_id}/last_image.png")
@@ -50,7 +54,7 @@ def guessing_page():
 
 def counter_component():
     """The counter component."""
-    st.text(
+    st.markdown(
         f"Time until next hint: {(hint_interval - st.session_state.count) % (hint_interval + 1)}")
 
 
@@ -69,7 +73,7 @@ def hint_component():
                 del mask[random.randint(0, len(mask) - 1)]
     else:
         mask = []
-    st.text(mask_word(st.session_state.word, mask))
+    st.markdown(f"<samp style='font-size: 2em; font-weight: bold;'>{mask_word(st.session_state.word, mask)}</samp>", unsafe_allow_html=True)
 
 
 @dataclass
