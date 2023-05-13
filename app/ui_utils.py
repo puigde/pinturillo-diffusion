@@ -15,7 +15,13 @@ def drawing_page_callback():
     st.session_state.generated_images = []
 
 
-def guessing_page_callback():
+def pre_guessing_page_callback():
+    st.session_state.current_page = "Pre_guessing"
+    st.session_state.generated_images = []
+
+
+def access_guessing_callback(game_id):
+    st.session_state.current_game_id = game_id
     st.session_state.current_page = "Guessing"
     st.session_state.generated_images = []
 

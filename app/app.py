@@ -2,13 +2,14 @@ import streamlit as st
 import yaml
 from landing_page import landing_page
 from drawing_page import drawing_page
-from guessing_page import guessing_page
+from guessing_page import pre_guessing_page, guessing_page
 
 
 def main():
     pages = {
         "Landing": landing_page,
         "Drawing": drawing_page,
+        "Pre_guessing": pre_guessing_page,
         "Guessing": guessing_page,
     }
     pages[st.session_state.current_page]()

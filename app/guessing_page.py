@@ -1,31 +1,58 @@
 import streamlit as st
+from ui_utils import show_centered_title, exit_button, access_guessing_callback, chat_callback
+import os
 import random
 from streamlit_autorefresh import st_autorefresh
-from ui_utils import show_centered_title, exit_button, chat_callback
+
+
+def pre_guessing_page():
+    st.session_state.current_page = "Pre_guessing"
+    show_centered_title("Enter a game id:")
+    game_id = st.text_input("Game id")
+    if not os.path.exists(f"game_{game_id}"):
+        prev_enter = st.button("Access game")
+        if prev_enter:
+            st.error("Game id does not exist")
+    else:
+        acess = st.button(
+            "Access game", on_click=access_guessing_callback, args=(game_id,))
+    exit_button()
+
 
 seed = 0  # TODO
 hint_interval = 3  # seconds
 
+
 def guessing_page():
     st.session_state.current_page = "Guessing"
-    show_centered_title("Guessing")
+    show_centered_title(f"Guessing in game {st.session_state.current_game_id}")
     st.session_state.word = "turtle"
-    st.session_state.count = st_autorefresh(interval=1000, limit=hint_interval * 60, key="counter")
+    st.session_state.count = st_autorefresh(
+        interval=1000, limit=hint_interval * 60, key="counter")
     c0, c1 = st.columns(2)
     with c0:
         counter_component()
         hint_component()
+        try:
+            st.image(
+                f"game_{st.session_state.current_game_id}/last_image.png")
+        except:
+            pass
     with c1:
         chat_component()
     exit_button()
 
+
 def counter_component():
     """The counter component."""
-    st.text(f"Time until next hint: {(hint_interval - st.session_state.count) % (hint_interval + 1)}")
+    st.text(
+        f"Time until next hint: {(hint_interval - st.session_state.count) % (hint_interval + 1)}")
+
 
 def mask_word(word, mask):
     """Masks a word with a list of indices."""
     return " ".join([word[i].upper() if i not in mask else "_" for i in range(len(word))])
+
 
 def hint_component():
     """The prompt component."""
@@ -63,4 +90,5 @@ def chat_component():
     {"".join([f"<p><span style='color: {usercolor};'>{username}</span>: {message}</p>" for message in st.session_state.chat])}
     </div>
     """, unsafe_allow_html=True)
-    st.text_input("", on_change=chat_callback, key="add_message", label_visibility="collapsed")
+    st.text_input("", on_change=chat_callback, key="add_message",
+                  label_visibility="collapsed")
