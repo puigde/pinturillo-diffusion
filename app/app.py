@@ -6,8 +6,6 @@ from guessing_page import guessing_page
 
 
 def main():
-    st.set_page_config(page_icon="logo.png",
-                       page_title="Pinturillo Diffusion", layout="wide")
     pages = {
         "Landing": landing_page,
         "Drawing": drawing_page,
@@ -44,7 +42,25 @@ def define_provider():
     st.session_state.model_provider = model_provider
 
 
+def init_streamlit_page():
+    st.set_page_config(page_icon="logo.png",
+                       page_title="Pinturillo Diffusion", layout="wide")
+    # hide_streamlit_style = """
+    #         <style>
+    #         #MainMenu {visibility: hidden;}
+    #         footer {visibility: hidden;}
+    #         </style>
+    #         """
+    hide_streamlit_style = """
+            <style>
+            footer {visibility: hidden;}
+            </style>
+            """
+    st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+
 if __name__ == "__main__":
+    init_streamlit_page()
     read_api_keys()
     define_provider()
     initialize_session_state()
