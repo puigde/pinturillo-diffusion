@@ -23,6 +23,9 @@ def create_game():
     if not os.path.exists(f"game_{game_id}"):
         os.makedirs(f"game_{game_id}")
 
+    with open(f"game_{game_id}/players.txt", "a") as f:
+        f.write(st.session_state.player_name + "\n")
+
 
 def drawing_component():
     """The main drawing component."""

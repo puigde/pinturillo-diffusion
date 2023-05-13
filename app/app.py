@@ -48,15 +48,11 @@ def define_provider():
 def init_streamlit_page():
     st.set_page_config(page_icon="logo.png",
                        page_title="Pinturillo Diffusion", layout="wide")
-    # hide_streamlit_style = """
-    #         <style>
-    #         #MainMenu {visibility: hidden;}
-    #         footer {visibility: hidden;}
-    #         </style>
-    #         """
     hide_streamlit_style = """
             <style>
+            #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
+            .block-container { padding-top: 1rem; padding-bottom: 0rem; padding-left: 5rem; padding-right: 5rem; }
             </style>
             """
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)

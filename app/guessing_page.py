@@ -20,10 +20,12 @@ def pre_guessing_page():
     if not os.path.exists(f"game_{current_game_id}"):
         prev_enter = st.button("Access game")
         if prev_enter:
-            st.error("Game id does not exist")
+            st.warning("Game id does not exist")
     else:
         acess = st.button(
             "Access game", on_click=access_guessing_callback, args=(current_game_id,))
+        if acess:
+            st.warning("Username taken for this game")
     exit_button()
 
 
@@ -103,7 +105,7 @@ def chat_component():
     m = f"""
     <style>
     #chat {{
-        height: 300px;
+        height: 550px;
         overflow-y: scroll;
         border: 1px solid #ccc;
     }}
