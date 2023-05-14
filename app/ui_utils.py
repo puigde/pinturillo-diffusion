@@ -16,10 +16,8 @@ def exit_button_callback():
 
 
 def drawing_page_callback():
-    print("DDDDDDDDDD")
     if st.session_state.player_name == "" or " " in st.session_state.player_name:
         return
-    print('EEEEEEEEEE')
     st.session_state.current_page = "Drawing"
     st.session_state.generated_images = []
 
@@ -50,16 +48,12 @@ def winner_update_game_state():
 
 
 def check_game_state(postgame_status="loading_next"):
-    print("current_game_id", st.session_state.current_game_id)
     with open(f"game_{st.session_state.current_game_id}/game_state.json", "r") as f:
         game_state = json.load(f)
-    print("bbbbbbb" + game_state["status"])
-    print("aaaaa" + postgame_status)
     if game_state["status"] == postgame_status:
         # postgame_page_callback()
         if st.session_state.player_name == "" or " " in st.session_state.player_name:
             return
-        print("here")
         st.session_state.current_page = "Postgame"
         st.session_state.generated_images = []
 

@@ -7,7 +7,7 @@ import os
 from streamlit_autorefresh import st_autorefresh
 from ui_utils import show_centered_title, exit_button, winner_update_game_state, check_game_state
 import time
-
+import json
 
 seed = time.time_ns() % 100  # TODO
 hint_interval = 20  # seconds
@@ -32,8 +32,9 @@ def pre_guessing_page():
 def guessing_page():
     check_game_state()
     show_centered_title(f"Guessing in game {st.session_state.current_game_id}")
-    with open(f"game_{st.session_state.current_game_id}/word.txt", "r") as f:
-        st.session_state.word = f.readlines()[-1].strip()
+    with open(f"game_{st.session_state.current_game_id}/game_state.json", "r") as f:
+        game_state = json.load(f)
+    st.session_state.word = game_state["word"]
     st.session_state.count = st_autorefresh(interval=1000, key="counter")
     c01, c02 = st.columns([1.2, 2])
     c0, c1 = st.columns(2)
@@ -132,7 +133,7 @@ def chat_component():
     </script>
     """
     st.markdown(m, unsafe_allow_html=True)
-    st.text_input("", on_change=chat_callback, key="add_message",
+    st.text_input("type here", on_change=chat_callback, key="add_message",
                   label_visibility="collapsed")
 
 

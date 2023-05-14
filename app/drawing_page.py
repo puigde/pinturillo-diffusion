@@ -14,8 +14,11 @@ def drawing_page():
     st.session_state.current_page = "Drawing"
     if st.session_state.current_game_id is None:
         create_game()
+    with open(f"game_{st.session_state.current_game_id}/game_state.json", "r") as f:
+        game_state = json.load(f)
+        word = game_state["word"]
     show_centered_title(
-        f"Drawing on game {st.session_state.current_game_id}: {st.session_state.word.upper()}")
+        f"Drawing on game {st.session_state.current_game_id}: {word}")
     drawing_component()
     exit_button()
 
@@ -38,10 +41,6 @@ def create_game(game_id=None, drawing_player=None):
     # Select a random word from that country
     random_word = random.choice(random_country[list(random_country.keys())[0]])
 
-    st.session_state.word, st.session_state.prompt = random_word['word'], random_word['prompt']
-    with open(f"game_{game_id}/word.txt", "a") as f:
-        f.write(st.session_state.word + "\n")
-
     with open(f"game_{game_id}/players.txt", "a") as f:
         f.write(st.session_state.player_name + "\n")
 
@@ -52,6 +51,8 @@ def create_game(game_id=None, drawing_player=None):
         "drawing_player": drawing_player,
         "status": "active",
         "next_game_id": -1,
+        "word": random_word["word"],
+        "prompt": random_word["prompt"],
     }
     # save the json file
     with open(f"game_{game_id}/game_state.json", "w") as f:
@@ -94,6 +95,10 @@ def drawing_component():
                 out = [Image.open("sample_image.png")]
 
             else:
+                # read prompt from json game state
+                with open(f"game_{st.session_state.current_game_id}/game_state.json", "r") as f:
+                    game_state = json.load(f)
+                st.session_state.prompt = game_state["prompt"]
                 out = run_model(canvas_result.image_data,
                                 st.session_state.prompt,
                                 model_provider=st.session_state.model_provider,

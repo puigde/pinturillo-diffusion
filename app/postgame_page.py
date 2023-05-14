@@ -18,9 +18,7 @@ def postgame_page():
             players = [player for player in players if player !=
                        st.session_state.player_name and player != ""]
             # pick a random player to be the next drawer
-            print(players)
             next_drawer = random.choice(players)
-            print(next_drawer)
             # update the game state
             game_state["next_drawing_player"] = next_drawer
             game_state["status"] = "loading_next"
