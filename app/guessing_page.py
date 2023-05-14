@@ -9,8 +9,8 @@ from ui_utils import show_centered_title, exit_button, winner_update_game_state,
 import time
 import json
 
-seed = time.time_ns() % 100  # TODO
-hint_interval = 3  # seconds
+seed = time.time_ns() % 100
+hint_interval = 40  # seconds
 
 
 def pre_guessing_page():
