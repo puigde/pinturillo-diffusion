@@ -5,12 +5,12 @@ import os
 import random
 import os
 from streamlit_autorefresh import st_autorefresh
-from ui_utils import show_centered_title, exit_button
+from ui_utils import show_centered_title, exit_button, winner_update_game_state, check_game_state
 import time
-
+import json
 
 seed = time.time_ns() % 100  # TODO
-hint_interval = 20  # seconds
+hint_interval = 3  # seconds
 
 
 def pre_guessing_page():
@@ -22,19 +22,21 @@ def pre_guessing_page():
         if prev_enter:
             st.warning("Game id does not exist")
     else:
-        acess = st.button(
+        access = st.button(
             "Access game", on_click=access_guessing_callback, args=(current_game_id,))
-        if acess:
+        if access:
             st.warning("Username taken for this game")
     exit_button()
 
 
 def guessing_page():
-    st.session_state.current_page = "Guessing"
+    check_game_state()
     show_centered_title(f"Guessing in game {st.session_state.current_game_id}")
-    with open(f"game_{st.session_state.current_game_id}/word.txt", "r") as f:
-        st.session_state.word = f.readlines()[-1].strip()
+    with open(f"game_{st.session_state.current_game_id}/game_state.json", "r") as f:
+        game_state = json.load(f)
+    st.session_state.word = game_state["word"]
     st.session_state.count = st_autorefresh(interval=1000, key="counter")
+    st.session_state.mask_count += 1
     c01, c02 = st.columns([1.2, 2])
     c0, c1 = st.columns(2)
     with c01:
@@ -55,7 +57,7 @@ def guessing_page():
 def counter_component():
     """The counter component."""
     st.markdown(
-        f"Time until next hint: {(hint_interval - st.session_state.count) % (hint_interval + 1)}")
+        f"Time until next hint: {(hint_interval - st.session_state.mask_count) % (hint_interval + 1)}")
 
 
 def mask_word(word, mask):
@@ -67,7 +69,7 @@ def hint_component():
     """The prompt component."""
     mask = [i for i in range(len(st.session_state.word))]
     if not hasattr(st.session_state, "solved"):
-        for i in range(st.session_state.count // hint_interval):
+        for i in range(st.session_state.mask_count // hint_interval):
             if len(mask) > 0:
                 random.seed(i + seed)
                 del mask[random.randint(0, len(mask) - 1)]
@@ -132,7 +134,7 @@ def chat_component():
     </script>
     """
     st.markdown(m, unsafe_allow_html=True)
-    st.text_input("", on_change=chat_callback, key="add_message",
+    st.text_input("Type here", on_change=chat_callback, key="add_message",
                   label_visibility="collapsed")
 
 
@@ -141,7 +143,9 @@ def chat_callback():
         f.write(f"{st.session_state.player_name} {st.session_state.add_message}\n")
     if st.session_state.add_message.upper() == st.session_state.word.upper():
         st.balloons()
+        st.session_state.mask_count = 0
         st.session_state.solved = True
+        winner_update_game_state()
     else:
         st.session_state.chat.append(st.session_state.add_message)
     st.session_state.add_message = ""

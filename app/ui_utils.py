@@ -3,6 +3,7 @@ from image_utils import img_to_html
 import os
 from PIL import Image
 from io import BytesIO
+import json
 
 
 def exit_button():
@@ -26,6 +27,36 @@ def pre_guessing_page_callback():
         return
     st.session_state.current_page = "Pre_guessing"
     st.session_state.generated_images = []
+
+
+def postgame_page_callback():
+    if st.session_state.player_name == "" or " " in st.session_state.player_name:
+        return
+    st.session_state.current_page = "Postgame"
+    st.session_state.generated_images = []
+
+
+def winner_update_game_state():
+    st.session_state.mask_count = 0
+    # Loads the game state
+    with open(f"game_{st.session_state.current_game_id}/game_state.json", "r") as f:
+        game_state = json.load(f)
+    game_state["status"] = "finished"
+    game_state["winner"] = st.session_state.player_name
+    # Saves the game state
+    with open(f"game_{st.session_state.current_game_id}/game_state.json", "w") as f:
+        json.dump(game_state, f)
+
+
+def check_game_state(postgame_status="loading_next"):
+    with open(f"game_{st.session_state.current_game_id}/game_state.json", "r") as f:
+        game_state = json.load(f)
+    if game_state["status"] == postgame_status:
+        # postgame_page_callback()
+        if st.session_state.player_name == "" or " " in st.session_state.player_name:
+            return
+        st.session_state.current_page = "Postgame"
+        st.session_state.generated_images = []
 
 
 def access_guessing_callback(game_id):
