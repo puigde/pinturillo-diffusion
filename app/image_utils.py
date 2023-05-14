@@ -2,6 +2,7 @@ from pathlib import Path
 import base64
 from PIL import Image
 from io import BytesIO
+import streamlit as st
 
 
 def img_to_bytes(img_path):

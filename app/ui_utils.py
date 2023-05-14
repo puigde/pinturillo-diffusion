@@ -1,6 +1,8 @@
 import streamlit as st
 from image_utils import img_to_html
 import os
+from PIL import Image
+from io import BytesIO
 
 
 def exit_button():
@@ -48,3 +50,11 @@ def show_centered_title(title, show_logo=True):
     else:
         st.markdown(f"<h1 style='text-align: center; color: black;'>{title}</h1>",
                     unsafe_allow_html=True)
+
+
+def display_generated_images():
+    for image in reversed(st.session_state.generated_images):
+        try:
+            st.image(image, width=500)
+        except:
+            st.image(Image.open(BytesIO(image)))

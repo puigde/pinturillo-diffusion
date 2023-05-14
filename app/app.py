@@ -41,7 +41,7 @@ def define_provider():
     """Defines the model provider. Current version is validated on replicate."""
     default_provider = "replicate"
     model_provider = default_provider
-    model_provider = None  # avoid replicate calls in test mode and display saved image
+    # model_provider = None  # avoid replicate calls in test mode and display saved image
     st.session_state.model_provider = model_provider
 
 
