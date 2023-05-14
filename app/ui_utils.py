@@ -37,6 +37,7 @@ def postgame_page_callback():
 
 
 def winner_update_game_state():
+    st.session_state.mask_count = 0
     # Loads the game state
     with open(f"game_{st.session_state.current_game_id}/game_state.json", "r") as f:
         game_state = json.load(f)

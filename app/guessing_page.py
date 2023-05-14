@@ -10,7 +10,7 @@ import time
 import json
 
 seed = time.time_ns() % 100  # TODO
-hint_interval = 20  # seconds
+hint_interval = 3  # seconds
 
 
 def pre_guessing_page():
@@ -36,6 +36,7 @@ def guessing_page():
         game_state = json.load(f)
     st.session_state.word = game_state["word"]
     st.session_state.count = st_autorefresh(interval=1000, key="counter")
+    st.session_state.mask_count += 1
     c01, c02 = st.columns([1.2, 2])
     c0, c1 = st.columns(2)
     with c01:
@@ -56,7 +57,7 @@ def guessing_page():
 def counter_component():
     """The counter component."""
     st.markdown(
-        f"Time until next hint: {(hint_interval - st.session_state.count) % (hint_interval + 1)}")
+        f"Time until next hint: {(hint_interval - st.session_state.mask_count) % (hint_interval + 1)}")
 
 
 def mask_word(word, mask):
@@ -68,7 +69,7 @@ def hint_component():
     """The prompt component."""
     mask = [i for i in range(len(st.session_state.word))]
     if not hasattr(st.session_state, "solved"):
-        for i in range(st.session_state.count // hint_interval):
+        for i in range(st.session_state.mask_count // hint_interval):
             if len(mask) > 0:
                 random.seed(i + seed)
                 del mask[random.randint(0, len(mask) - 1)]
@@ -133,7 +134,7 @@ def chat_component():
     </script>
     """
     st.markdown(m, unsafe_allow_html=True)
-    st.text_input("type here", on_change=chat_callback, key="add_message",
+    st.text_input("Type here", on_change=chat_callback, key="add_message",
                   label_visibility="collapsed")
 
 
@@ -142,6 +143,7 @@ def chat_callback():
         f.write(f"{st.session_state.player_name} {st.session_state.add_message}\n")
     if st.session_state.add_message.upper() == st.session_state.word.upper():
         st.balloons()
+        st.session_state.mask_count = 0
         st.session_state.solved = True
         winner_update_game_state()
     else:

@@ -32,6 +32,10 @@ def initialize_session_state():
         st.session_state.player_name = ""
     if "prompt" not in st.session_state:
         st.session_state.prompt = ""
+    if "count" not in st.session_state:
+        st.session_state.count = 0
+    if "mask_count" not in st.session_state:
+        st.session_state.mask_count = 0
 
 
 def read_api_keys():
