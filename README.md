@@ -1,6 +1,6 @@
 # Pinturillo Diffusion
 
-[Our website](www.pinturillo_diffusion.tech)
+[Our website](http://pinturillo-diffusion.tech/)
 
 ## Running
 
