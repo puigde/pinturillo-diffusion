@@ -3,6 +3,7 @@ import yaml
 from landing_page import landing_page
 from drawing_page import drawing_page
 from guessing_page import pre_guessing_page, guessing_page
+from postgame_page import postgame_page
 
 
 def main():
@@ -11,6 +12,7 @@ def main():
         "Drawing": drawing_page,
         "Pre_guessing": pre_guessing_page,
         "Guessing": guessing_page,
+        "Postgame": postgame_page,
     }
     pages[st.session_state.current_page]()
 

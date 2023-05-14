@@ -5,7 +5,7 @@ import os
 import random
 import os
 from streamlit_autorefresh import st_autorefresh
-from ui_utils import show_centered_title, exit_button
+from ui_utils import show_centered_title, exit_button, winner_update_game_state, check_game_state
 import time
 
 
@@ -22,15 +22,15 @@ def pre_guessing_page():
         if prev_enter:
             st.warning("Game id does not exist")
     else:
-        acess = st.button(
+        access = st.button(
             "Access game", on_click=access_guessing_callback, args=(current_game_id,))
-        if acess:
+        if access:
             st.warning("Username taken for this game")
     exit_button()
 
 
 def guessing_page():
-    st.session_state.current_page = "Guessing"
+    check_game_state()
     show_centered_title(f"Guessing in game {st.session_state.current_game_id}")
     st.session_state.word = "turtle"
     st.session_state.count = st_autorefresh(interval=1000, key="counter")
@@ -141,6 +141,7 @@ def chat_callback():
     if st.session_state.add_message.upper() == st.session_state.word.upper():
         st.balloons()
         st.session_state.solved = True
+        winner_update_game_state()
     else:
         st.session_state.chat.append(st.session_state.add_message)
     st.session_state.add_message = ""

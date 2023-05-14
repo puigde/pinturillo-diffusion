@@ -5,7 +5,8 @@ from PIL import Image
 from model_utils import run_model, process_model_outputs
 import random
 import os
-from ui_utils import display_generated_images
+from ui_utils import display_generated_images, check_game_state
+import json
 
 
 def drawing_page():
@@ -17,9 +18,10 @@ def drawing_page():
     exit_button()
 
 
-def create_game():
+def create_game(game_id=None, drawing_player=None):
     """A game is defined by a random four digit game id. Each game has a directory in the server"""
-    game_id = random.randint(1000, 9999)
+    if game_id is None:
+        game_id = random.randint(1000, 9999)
     st.session_state.current_game_id = game_id
     if not os.path.exists(f"game_{game_id}"):
         os.makedirs(f"game_{game_id}")
@@ -27,9 +29,22 @@ def create_game():
     with open(f"game_{game_id}/players.txt", "a") as f:
         f.write(st.session_state.player_name + "\n")
 
+    if drawing_player is None:
+        drawing_player = st.session_state.player_name
+    # create a json using json module from python dict file to store the game state
+    game_state = {
+        "drawing_player": drawing_player,
+        "status": "active",
+        "next_game_id": -1,
+    }
+    # save the json file
+    with open(f"game_{game_id}/game_state.json", "w") as f:
+        json.dump(game_state, f)
+
 
 def drawing_component():
     """The main drawing component."""
+    check_game_state(postgame_status="finished")
     c0, c1 = st.columns(2)
     with c0:
         canvas_result = st_canvas(
