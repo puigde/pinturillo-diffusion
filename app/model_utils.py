@@ -9,9 +9,9 @@ import requests
 from ui_utils import display_generated_images
 
 
-def run_model(image_data, model_provider="replicate"):
+def run_model(image_data, prompt, model_provider="replicate"):
     """Runs the model on the painted image."""
-    model_inputs = get_model_inputs(image_data, model_provider=model_provider)
+    model_inputs = get_model_inputs(image_data, prompt, model_provider=model_provider)
     if model_provider == "banana":
         out = banana.run(st.session_state.api_keys["banana-api"],
                          st.session_state.api_keys["banana-model"], model_inputs)
@@ -50,13 +50,13 @@ def process_model_outputs(out, model_provider="replicate"):
                     f"game_{st.session_state.current_game_id}/last_image.png")
 
 
-def get_model_inputs(image_data, model_provider="replicate"):
+def get_model_inputs(image_data, prompt, model_provider="replicate"):
     """Gets a json serializable object of model inputs. Key components are prompt and image."""
     assert model_provider in ["banana", "replicate"]
     if model_provider == "banana":
         image_file = prepare_input_image(image_data)
         model_inputs = {
-            "prompt": "rihanna best quality, extremely detailed",
+            "prompt": prompt,
             "negative_prompt": "monochrome, lowres, bad anatomy, worst quality, low quality",
             "num_inference_steps": 20,
             "image_data":  image_file,
@@ -64,7 +64,7 @@ def get_model_inputs(image_data, model_provider="replicate"):
     elif model_provider == "replicate":
         image_file = prepare_input_image(image_data)
         model_inputs = {
-            "prompt": "rihanna best quality, extremely detailed",
+            "prompt": prompt,
             "structure": "scribble",
             "image":  image_file,
         }

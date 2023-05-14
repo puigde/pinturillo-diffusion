@@ -32,7 +32,8 @@ def pre_guessing_page():
 def guessing_page():
     check_game_state()
     show_centered_title(f"Guessing in game {st.session_state.current_game_id}")
-    st.session_state.word = "turtle"
+    with open(f"game_{st.session_state.current_game_id}/word.txt", "r") as f:
+        st.session_state.word = f.readlines()[-1].strip()
     st.session_state.count = st_autorefresh(interval=1000, key="counter")
     c01, c02 = st.columns([1.2, 2])
     c0, c1 = st.columns(2)
