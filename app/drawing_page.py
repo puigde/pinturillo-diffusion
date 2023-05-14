@@ -5,13 +5,14 @@ from PIL import Image
 from model_utils import run_model, process_model_outputs
 import random
 import os
+import yaml
 
 
 def drawing_page():
     st.session_state.current_page = "Drawing"
     if st.session_state.current_game_id is None:
         create_game()
-    show_centered_title(f"Drawing on game {st.session_state.current_game_id}")
+    show_centered_title(f"Drawing on game {st.session_state.current_game_id}: {st.session_state.word.upper()}")
     drawing_component()
     exit_button()
 
@@ -22,6 +23,20 @@ def create_game():
     st.session_state.current_game_id = game_id
     if not os.path.exists(f"game_{game_id}"):
         os.makedirs(f"game_{game_id}")
+    
+    with open("games.yaml") as f:
+        themes = yaml.load(f, Loader=yaml.FullLoader)
+
+    # Select a random country
+    random_country = random.choice(themes)
+    # country_name = list(random_country.keys())[0]
+
+    # Select a random word from that country
+    random_word = random.choice(random_country[list(random_country.keys())[0]])
+
+    st.session_state.word, st.session_state.prompt = random_word['word'], random_word['prompt']
+    with open(f"game_{game_id}/word.txt", "a") as f:
+        f.write(st.session_state.word + "\n")
 
     with open(f"game_{game_id}/players.txt", "a") as f:
         f.write(st.session_state.player_name + "\n")
@@ -63,5 +78,7 @@ def drawing_component():
 
             else:
                 out = run_model(canvas_result.image_data,
-                                model_provider=st.session_state.model_provider)
+                                st.session_state.prompt,
+                                model_provider=st.session_state.model_provider,
+                                )
             process_model_outputs(out)
